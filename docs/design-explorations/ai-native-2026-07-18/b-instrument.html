@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>B — Instrument</title>
+<style>
+  :root {
+    --bg: #f7f7f5;
+    --surface: #ffffff;
+    --border: #e6e6e0;
+    --border-strong: #d4d4cc;
+    --text: #14161a;
+    --text-muted: #5f666d;
+    --text-faint: #9aa0a6;
+    --accent: #0f6b4a;
+    --accent-soft: #e6f2ec;
+    --input-blue: #1d4ed8;
+    --warning: #b45309;
+    --warning-soft: #fef3e2;
+    --danger: #b91c1c;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    width: 380px;
+    min-height: 100vh;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Status header */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2px;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .pill .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+  .staleness { font-size: 10px; color: var(--text-faint); font-family: var(--mono); }
+
+  /* Hero card — huge numeral */
+  .hero-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px 12px;
+  }
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 4px;
+  }
+  .hero-addr {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .hero-value {
+    font-family: var(--mono);
+    font-size: 34px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .hero-value .unit { font-size: 18px; color: var(--text-muted); font-weight: 500; }
+  .hero-spark {
+    margin-top: 10px;
+    height: 24px;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+  }
+  .spark-bar {
+    flex: 1;
+    background: var(--border-strong);
+    border-radius: 1px;
+    min-height: 2px;
+  }
+  .spark-bar.current { background: var(--accent); }
+
+  /* Tile grid */
+  .tiles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .tile.span-2 { grid-column: span 2; }
+  .tile-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .tile-label .count { color: var(--text-muted); font-weight: 500; text-transform: none; letter-spacing: 0; }
+
+  /* Formula tile */
+  .formula-body {
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    word-break: break-all;
+  }
+  .formula-body .fn { color: var(--accent); font-weight: 600; }
+  .formula-body .ref { color: var(--input-blue); }
+  .formula-body .external { color: var(--warning); }
+
+  /* Precedents tile — compact rows */
+  .dep-list { display: flex; flex-direction: column; gap: 4px; }
+  .dep-compact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .dep-compact .ref { color: var(--text); font-weight: 500; }
+  .dep-compact .val { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .dep-compact .val.warn { color: var(--warning); }
+
+  /* Risk tile */
+  .risk-list { display: flex; flex-direction: column; gap: 4px; }
+  .risk-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .risk-badge {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--warning);
+    flex-shrink: 0;
+  }
+  .risk-badge.cross-sheet { background: var(--input-blue); }
+
+  /* Action footer */
+  .actions {
+    margin-top: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .btn {
+    padding: 7px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    text-align: center;
+  }
+  .btn:hover { background: var(--bg); }
+  .btn.primary { background: var(--text); color: var(--surface); border-color: var(--text); }
+  .btn.primary:hover { background: #000; }
+</style>
+</head>
+<body>
+
+<div class="status-bar">
+  <span class="pill"><span class="dot"></span>Live</span>
+  <span class="staleness">refreshed 2s ago</span>
+</div>
+
+<div class="hero-card">
+  <div class="hero-eyebrow">
+    <span>Internal rate of return</span>
+    <span>DCF</span>
+  </div>
+  <div class="hero-addr">DCF!$F$42 · formula</div>
+  <div class="hero-value">18.42<span class="unit">%</span></div>
+  <div class="hero-spark">
+    <div class="spark-bar" style="height:30%"></div>
+    <div class="spark-bar" style="height:45%"></div>
+    <div class="spark-bar" style="height:38%"></div>
+    <div class="spark-bar" style="height:60%"></div>
+    <div class="spark-bar" style="height:52%"></div>
+    <div class="spark-bar" style="height:75%"></div>
+    <div class="spark-bar current" style="height:100%"></div>
+  </div>
+</div>
+
+<div class="tiles">
+  <div class="tile span-2">
+    <div class="tile-label">Formula</div>
+    <div class="formula-body">
+      <span class="fn">=IRR</span>(<span class="ref">Inputs!$B$7:$B$12</span>) + <span class="ref">DCF!$D$20</span> × <span class="external">[Debt.xlsx]Terms!$B$4</span>
+    </div>
+  </div>
+
+  <div class="tile">
+    <div class="tile-label">Precedents <span class="count">5</span></div>
+    <div class="dep-list">
+      <div class="dep-compact"><span class="ref">Inputs!B7</span><span class="val">9.5%</span></div>
+      <div class="dep-compact"><span class="ref">DCF!D20</span><span class="val">2.5%</span></div>
+      <div class="dep-compact"><span class="ref">DCF!C10</span><span class="val">$1,240</span></div>
+      <div class="dep-compact"><span class="ref">Terms!B4 ⇢</span><span class="val warn">5.25%</span></div>
+      <div class="dep-compact"><span class="ref">INDIRECT ~</span><span class="val warn">—</span></div>
+    </div>
+  </div>
+
+  <div class="tile">
+    <div class="tile-label">Risk <span class="count">2</span></div>
+    <div class="risk-list">
+      <div class="risk-item"><span class="risk-badge cross-sheet"></span>cross-sheet ×2</div>
+      <div class="risk-item"><span class="risk-badge"></span>external link</div>
+      <div class="risk-item"><span class="risk-badge"></span>dynamic ref</div>
+    </div>
+  </div>
+</div>
+
+<div class="actions">
+  <button class="btn">Pin output</button>
+  <button class="btn primary">Trace →</button>
+</div>
+
+</body>
+</html>

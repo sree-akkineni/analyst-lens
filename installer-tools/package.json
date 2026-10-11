@@ -1,0 +1,13 @@
+{
+  "name": "analyst-lens-installer-tools",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13 <23",
+    "npm": "10.9.8"
+  },
+  "dependencies": {
+    "office-addin-dev-certs": "2.0.10"
+  }
+}

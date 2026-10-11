@@ -1,0 +1,430 @@
+#!/bin/bash
+set -euo pipefail
+
+export PATH="/opt/homebrew/opt/node@22/bin:$PATH"
+
+script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+source_root="${ANALYST_LENS_SOURCE_ROOT:-$(CDPATH= cd -- "${script_dir}/.." && pwd -P)}"
+
+launchctl_command="${ANALYST_LENS_LAUNCHCTL:-/bin/launchctl}"
+curl_command="${ANALYST_LENS_CURL:-/usr/bin/curl}"
+npm_command="${ANALYST_LENS_NPM:-/opt/homebrew/opt/node@22/bin/npm}"
+node_command="${ANALYST_LENS_NODE:-/opt/homebrew/opt/node@22/bin/node}"
+
+label="com.analystlens.local-host"
+manifest_id="5db4c51e-9c38-4d8b-976b-2d0f707e27f5"
+user_id="$(/usr/bin/id -u)"
+service_target="gui/${user_id}/${label}"
+app_root="${HOME}/Library/Application Support/Analyst Lens"
+release_dir="${app_root}/release"
+runtime_dir="${release_dir}/runtime"
+asset_dir="${release_dir}/assets"
+tooling_dir="${app_root}/tooling"
+tooling_owner_file="${app_root}/tooling.owner"
+installed_scripts_dir="${app_root}/scripts"
+installed_manifest="${app_root}/manifest.xml"
+release_manifest="${release_dir}/manifest.xml"
+ownership_file="${app_root}/registration.owner"
+launch_agent_hash_file="${app_root}/launch-agent.sha256"
+version_file="${app_root}/version"
+plist_path="${HOME}/Library/LaunchAgents/${label}.plist"
+manifest_registration="${HOME}/Library/Containers/com.microsoft.Excel/Data/Documents/wef/${manifest_id}.manifest.xml"
+cert_file="${HOME}/.office-addin-dev-certs/localhost.crt"
+key_file="${HOME}/.office-addin-dev-certs/localhost.key"
+
+source_available=false
+if [[ -f "${source_root}/manifest.xml" && -f "${source_root}/package.json" ]]; then
+  source_available=true
+fi
+
+if [[ "$source_available" == true ]]; then
+  source_manifest_id="$(/usr/bin/awk -F '[<>]' '/<Id>/ { print $3; exit }' "${source_root}/manifest.xml")"
+  [[ "$source_manifest_id" == "$manifest_id" ]] || {
+    printf 'Analyst Lens manifest ID mismatch\n' >&2
+    exit 1
+  }
+  version="$(/usr/bin/awk -F '"' '/"version"[[:space:]]*:/ { print $4; exit }' "${source_root}/package.json")"
+elif [[ -f "$version_file" ]]; then
+  version="$(<"$version_file")"
+else
+  version="0.1.0"
+fi
+
+expected_health="{\"name\":\"Analyst Lens\",\"version\":\"${version}\"}"
+export ANALYST_LENS_CERT_FILE="$cert_file"
+
+staged_tooling=""
+new_install=false
+install_completed=false
+registration_created=false
+
+file_hash() {
+  /usr/bin/shasum -a 256 "$1" | /usr/bin/awk '{ print $1 }'
+}
+
+metadata_value() {
+  local file="$1" key="$2"
+  [[ -f "$file" ]] || return 1
+  /usr/bin/awk -F= -v key="$key" '$1 == key { sub(/^[^=]*=/, ""); print; exit }' "$file"
+}
+
+owner_value() {
+  metadata_value "$ownership_file" "$1"
+}
+
+metadata_core_is_valid() {
+  local expected_hash owner_manifest_id owner_path
+  [[ -f "$ownership_file" && -f "$release_manifest" ]] || return 1
+  owner_manifest_id="$(owner_value manifest_id)"
+  owner_path="$(owner_value registration_path)"
+  expected_hash="$(owner_value manifest_sha256)"
+  [[ "$owner_manifest_id" == "$manifest_id" ]] || return 1
+  [[ "$owner_path" == "$manifest_registration" ]] || return 1
+  [[ "$expected_hash" =~ ^[0-9A-Fa-f]{64}$ ]] || return 1
+  [[ "$(file_hash "$release_manifest")" == "$expected_hash" ]]
+}
+
+ownership_is_valid() {
+  local expected_hash
+  metadata_core_is_valid || return 1
+  [[ -f "$installed_manifest" && -f "$manifest_registration" ]] || return 1
+  [[ "$installed_manifest" -ef "$manifest_registration" ]] || return 1
+  expected_hash="$(owner_value manifest_sha256)"
+  [[ "$(file_hash "$installed_manifest")" == "$expected_hash" ]]
+}
+
+certificate_is_valid() {
+  [[ -f "$cert_file" && -f "$key_file" ]] || return 1
+  [[ -x "${tooling_dir}/node_modules/.bin/office-addin-dev-certs" ]] || return 1
+  "${tooling_dir}/node_modules/.bin/office-addin-dev-certs" verify >/dev/null 2>&1
+}
+
+registered_pid() {
+  local launch_state
+  launch_state="$("$launchctl_command" print "$service_target" 2>/dev/null)" || return 1
+  printf '%s\n' "$launch_state" | /usr/bin/awk '/pid =/ { print $3; exit }'
+}
+
+launch_agent_is_valid() {
+  local actual_hash expected_hash
+  [[ -f "$plist_path" && -f "$launch_agent_hash_file" ]] || return 1
+  expected_hash="$(<"$launch_agent_hash_file")"
+  [[ "$expected_hash" =~ ^[0-9A-Fa-f]{64}$ ]] || return 1
+  actual_hash="$(file_hash "$plist_path")"
+  [[ "$actual_hash" == "$expected_hash" ]]
+}
+
+tooling_tree_hash() {
+  (
+    cd "$tooling_dir"
+    /usr/bin/tar -cf - package.json package-lock.json node_modules
+  ) | /usr/bin/shasum -a 256 | /usr/bin/awk '{ print $1 }'
+}
+
+tooling_is_valid() {
+  [[ -x "${tooling_dir}/node_modules/.bin/office-addin-dev-certs" ]] || return 1
+  [[ -f "${tooling_dir}/package.json" ]] || return 1
+  [[ -f "${tooling_dir}/package-lock.json" ]] || return 1
+  [[ -f "$tooling_owner_file" ]] || return 1
+  [[ "$(tooling_tree_hash)" == "$(metadata_value "$tooling_owner_file" tree_sha256)" ]] || return 1
+  [[ "$(file_hash "${tooling_dir}/package.json")" == "$(metadata_value "$tooling_owner_file" package_sha256)" ]] || return 1
+  [[ "$(file_hash "${tooling_dir}/package-lock.json")" == "$(metadata_value "$tooling_owner_file" lock_sha256)" ]] || return 1
+  [[ "$(file_hash "${tooling_dir}/node_modules/.bin/office-addin-dev-certs")" == "$(metadata_value "$tooling_owner_file" dev_certs_sha256)" ]]
+}
+
+cleanup_staged_tooling() {
+  if [[ -n "$staged_tooling" && -d "$staged_tooling" ]]; then
+    rm -rf "$staged_tooling"
+  fi
+  staged_tooling=""
+}
+
+rollback_new_install() {
+  cleanup_staged_tooling
+  if [[ "$new_install" != true || "$install_completed" == true ]]; then
+    return
+  fi
+
+  set +e
+  if "$launchctl_command" print "$service_target" >/dev/null 2>&1; then
+    "$launchctl_command" bootout "$service_target" >/dev/null 2>&1
+  fi
+  if [[ "$registration_created" == true && -f "$installed_manifest" && -f "$manifest_registration" && "$installed_manifest" -ef "$manifest_registration" ]]; then
+    rm -f "$manifest_registration"
+  fi
+  if launch_agent_is_valid; then
+    rm -f "$plist_path"
+  fi
+  rm -rf "$app_root"
+}
+
+trap rollback_new_install EXIT
+
+check_status() {
+  local health pid
+  ownership_is_valid || return 1
+  launch_agent_is_valid || return 1
+  pid="$(registered_pid)" || return 1
+  [[ "$pid" =~ ^[0-9]+$ ]] || return 1
+  kill -0 "$pid" 2>/dev/null || return 1
+  certificate_is_valid || return 1
+  tooling_is_valid || return 1
+  health="$("$curl_command" --silent --show-error --fail --cacert "$cert_file" "https://127.0.0.1:43119/health" 2>/dev/null)" || return 1
+  [[ "$health" == "$expected_health" ]]
+}
+
+build_runtime() {
+  [[ "$source_available" == true ]] || {
+    printf 'Analyst Lens source checkout is unavailable\n' >&2
+    return 1
+  }
+  (
+    cd "$source_root"
+    "$npm_command" run build
+  )
+  [[ -f "${source_root}/dist/taskpane.html" ]]
+  [[ -f "${source_root}/dist/quick-trace.html" ]]
+  [[ -f "${source_root}/dist-host/server.js" ]]
+}
+
+stage_tooling() {
+  local installer_tools_source tooling_source
+  staged_tooling="$(/usr/bin/mktemp -d "${TMPDIR:-/tmp}/analyst-lens-tools.XXXXXX")"
+  tooling_source="${ANALYST_LENS_TOOLING_SOURCE:-}"
+  if [[ -n "$tooling_source" ]]; then
+    cp -R "${tooling_source}/." "$staged_tooling/"
+  else
+    installer_tools_source="${script_dir}/../installer-tools"
+    [[ -f "${installer_tools_source}/package.json" && -f "${installer_tools_source}/package-lock.json" ]] || {
+      printf 'Analyst Lens installer tooling metadata is missing\n' >&2
+      rm -rf "$staged_tooling"
+      return 1
+    }
+    cp "${installer_tools_source}/package.json" "${installer_tools_source}/package-lock.json" "$staged_tooling/"
+    if ! (
+      cd "$staged_tooling"
+      "$npm_command" ci --offline --ignore-scripts --omit=dev
+    ); then
+      printf 'Analyst Lens offline dependency cache miss; run npm ci in the Analyst Lens source checkout and retry\n' >&2
+      rm -rf "$staged_tooling"
+      return 1
+    fi
+  fi
+  [[ -x "${staged_tooling}/node_modules/.bin/office-addin-dev-certs" ]] || {
+    printf 'Analyst Lens staged certificate tooling is incomplete\n' >&2
+    rm -rf "$staged_tooling"
+    return 1
+  }
+}
+
+write_tooling_ownership() {
+  {
+    printf 'tree_sha256=%s\n' "$(tooling_tree_hash)"
+    printf 'package_sha256=%s\n' "$(file_hash "${tooling_dir}/package.json")"
+    printf 'lock_sha256=%s\n' "$(file_hash "${tooling_dir}/package-lock.json")"
+    printf 'dev_certs_sha256=%s\n' "$(file_hash "${tooling_dir}/node_modules/.bin/office-addin-dev-certs")"
+  } > "${tooling_owner_file}.next"
+  mv "${tooling_owner_file}.next" "$tooling_owner_file"
+}
+
+deploy_fresh_payload() {
+  local next_release next_scripts next_tooling
+  next_release="${app_root}/.release.next"
+  next_scripts="${app_root}/.scripts.next"
+  next_tooling="${app_root}/.tooling.next"
+  mkdir -p "$app_root"
+  rm -rf "$next_release" "$next_scripts" "$next_tooling"
+  mkdir -p "${next_release}/runtime" "${next_release}/assets" "$next_scripts" "$next_tooling"
+  cp -R "${source_root}/dist-host/." "${next_release}/runtime/"
+  cp -R "${source_root}/dist/." "${next_release}/assets/"
+  cp "${source_root}/manifest.xml" "${next_release}/manifest.xml"
+  cp -R "${staged_tooling}/." "$next_tooling/"
+  cp "${script_dir}/analyst-lens" "${script_dir}/install-launch-agent.sh" "$next_scripts/"
+  chmod 755 "${next_scripts}/analyst-lens" "${next_scripts}/install-launch-agent.sh"
+  rm -rf "$release_dir" "$tooling_dir" "$installed_scripts_dir"
+  mv "$next_release" "$release_dir"
+  mv "$next_tooling" "$tooling_dir"
+  mv "$next_scripts" "$installed_scripts_dir"
+  write_tooling_ownership
+  cp "$release_manifest" "${installed_manifest}.next"
+  mv "${installed_manifest}.next" "$installed_manifest"
+  printf '%s\n' "$version" > "$version_file"
+  cleanup_staged_tooling
+}
+
+install_certificate() {
+  if certificate_is_valid; then
+    return
+  fi
+  "${tooling_dir}/node_modules/.bin/office-addin-dev-certs" install --days 3650 --domains 127.0.0.1,localhost
+  certificate_is_valid
+}
+
+write_ownership() {
+  local expected_hash
+  expected_hash="$(file_hash "$release_manifest")"
+  {
+    printf 'manifest_id=%s\n' "$manifest_id"
+    printf 'manifest_sha256=%s\n' "$expected_hash"
+    printf 'registration_path=%s\n' "$manifest_registration"
+  } > "${ownership_file}.next"
+  mv "${ownership_file}.next" "$ownership_file"
+}
+
+register_new_manifest() {
+  [[ ! -e "$manifest_registration" ]] || {
+    printf 'Analyst Lens refuses to replace an unowned Excel manifest registration\n' >&2
+    return 1
+  }
+  mkdir -p "$(dirname "$manifest_registration")"
+  ln "$installed_manifest" "$manifest_registration"
+  registration_created=true
+  write_ownership
+  ownership_is_valid
+}
+
+repair_owned_registration() {
+  local expected_hash
+  metadata_core_is_valid || return 1
+  expected_hash="$(owner_value manifest_sha256)"
+  if [[ -e "$manifest_registration" ]]; then
+    printf 'Analyst Lens registration is not bound to its owned manifest; refusing repair\n' >&2
+    return 1
+  fi
+  [[ -f "$installed_manifest" ]] || return 1
+  [[ "$(file_hash "$installed_manifest")" == "$expected_hash" ]] || {
+    printf 'Analyst Lens installed manifest failed ownership validation; refusing repair\n' >&2
+    return 1
+  }
+  mkdir -p "$(dirname "$manifest_registration")"
+  ln "$installed_manifest" "$manifest_registration"
+  ownership_is_valid
+}
+
+ensure_registration() {
+  if ownership_is_valid; then
+    return
+  fi
+  if metadata_core_is_valid; then
+    repair_owned_registration
+    return
+  fi
+  if [[ -e "$ownership_file" ]]; then
+    printf 'Analyst Lens registration ownership metadata is invalid; refusing repair\n' >&2
+    return 1
+  fi
+  register_new_manifest
+}
+
+install_launch_agent() {
+  local helper="${installed_scripts_dir}/install-launch-agent.sh"
+  if [[ -e "$plist_path" ]] && ! launch_agent_is_valid; then
+    printf 'Analyst Lens refuses to replace an unowned launch agent\n' >&2
+    return 1
+  fi
+  "$helper" \
+    "$plist_path" \
+    "$node_command" \
+    "${runtime_dir}/server.js" \
+    "$app_root" \
+    "$asset_dir" \
+    "$cert_file" \
+    "$key_file" \
+    "$version"
+  file_hash "$plist_path" > "$launch_agent_hash_file"
+  if "$launchctl_command" print "$service_target" >/dev/null 2>&1; then
+    "$launchctl_command" bootout "$service_target"
+  fi
+  "$launchctl_command" bootstrap "gui/${user_id}" "$plist_path"
+  "$launchctl_command" kickstart -k "$service_target"
+}
+
+wait_until_healthy() {
+  local attempt
+  for attempt in {1..40}; do
+    if check_status; then
+      return
+    fi
+    /bin/sleep 0.25
+  done
+  return 1
+}
+
+ensure_local_payload() {
+  if [[ -d "$app_root" ]]; then
+    [[ -f "$release_manifest" && -f "$installed_manifest" && -f "${installed_scripts_dir}/analyst-lens" ]] || {
+      printf 'Analyst Lens installed payload is incomplete; rerun install from the source checkout\n' >&2
+      return 1
+    }
+    tooling_is_valid
+    return
+  fi
+  [[ "$source_available" == true ]] || {
+    printf 'Analyst Lens is not installed and the source checkout is unavailable\n' >&2
+    return 1
+  }
+  new_install=true
+  build_runtime
+  stage_tooling
+  deploy_fresh_payload
+}
+
+install_or_repair() {
+  local result="$1"
+  if check_status; then
+    printf 'healthy\n'
+    return
+  fi
+  ensure_local_payload
+  install_certificate
+  ensure_registration
+  install_launch_agent
+  if ! wait_until_healthy; then
+    printf 'Analyst Lens failed lifecycle validation after %s\n' "$result" >&2
+    return 1
+  fi
+  install_completed=true
+  printf '%s\n' "$result"
+}
+
+uninstall() {
+  if [[ ! -d "$app_root" ]]; then
+    if [[ -e "$manifest_registration" || -e "$plist_path" ]]; then
+      printf 'Analyst Lens local ownership metadata is absent; refusing to remove orphaned artifacts\n' >&2
+      return 1
+    fi
+    printf 'uninstalled\n'
+    return
+  fi
+  ownership_is_valid || {
+    printf 'Analyst Lens registration ownership metadata is invalid; refusing uninstall\n' >&2
+    return 1
+  }
+  if [[ -e "$plist_path" ]] && ! launch_agent_is_valid; then
+    printf 'Analyst Lens launch agent ownership is invalid; refusing uninstall\n' >&2
+    return 1
+  fi
+  if "$launchctl_command" print "$service_target" >/dev/null 2>&1; then
+    "$launchctl_command" bootout "$service_target"
+  fi
+  rm -f "$plist_path" "$manifest_registration"
+  rm -rf "$app_root"
+  printf 'uninstalled\n'
+}
+
+case "${1:-}" in
+  install) install_or_repair installed ;;
+  repair) install_or_repair repaired ;;
+  status)
+    if check_status; then
+      printf 'healthy\n'
+    else
+      exit 1
+    fi
+    ;;
+  uninstall) uninstall ;;
+  *)
+    printf 'usage: %s install|repair|status|uninstall\n' "$0" >&2
+    exit 64
+    ;;
+esac

@@ -1,0 +1,108 @@
+/* Analyst Lens design tokens — adaptive AI-native hybrid.
+   Command chrome (launcher-style) × Marginalia editorial content model.
+   Teal = computed/live. Amber = annotation/editorial. Neutral everything else. */
+
+:root {
+  color-scheme: light dark;
+
+  /* Surfaces */
+  --al-bg: #f5f5f7;
+  --al-surface: #ffffff;
+  --al-surface-2: #f2f2f4;
+  --al-surface-raised: #ffffff;
+  --al-surface-sunken: #ececef;
+
+  /* Ink */
+  --al-ink: #1d1d1f;
+  --al-ink-soft: #424245;
+  --al-ink-mute: #5d5d62;
+  --al-ink-faint: #6e6e73;
+
+  /* Borders */
+  --al-border: #d2d2d7;
+  --al-border-strong: #a8a8ad;
+  --al-border-subtle: #e5e5ea;
+
+  /* Accents — the split */
+  --al-live: #006b5f;          /* computed value, live signal */
+  --al-live-dim: #007a6e;
+  --al-live-soft: #e2f3f0;
+  --al-annotation: #8a4b08;    /* editorial glosses, marginalia */
+  --al-annotation-soft: #f7eadb;
+
+  /* Semantic */
+  --al-input-blue: #0057b7;
+  --al-warning: #805000;
+  --al-warning-soft: #fff3d6;
+  --al-danger: #b42318;
+  --al-danger-soft: #fdecea;
+  --al-ok: #006b5f;
+
+  /* Focus */
+  --al-focus: #0067c0;
+  --al-on-accent: #ffffff;
+
+  /* Type */
+  --al-font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  --al-font-serif: "New York", "Iowan Old Style", Georgia, serif;
+  --al-font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+  --al-fs-display: 26px;
+  --al-fs-hero-value: 22px;
+  --al-fs-title: 15px;
+  --al-fs-body: 12.5px;
+  --al-fs-small: 11.5px;
+  --al-fs-micro: 10px;
+  --al-fs-tiny: 9px;
+
+  /* Spacing scale */
+  --al-space-1: 3px;
+  --al-space-2: 6px;
+  --al-space-3: 9px;
+  --al-space-4: 12px;
+  --al-space-5: 16px;
+  --al-space-6: 20px;
+  --al-space-7: 24px;
+
+  /* Radius */
+  --al-radius-sm: 4px;
+  --al-radius: 6px;
+  --al-radius-lg: 8px;
+
+  /* Shadow */
+  --al-shadow-pop: 0 12px 40px rgb(0 0 0 / 18%);
+  --al-shadow-sticky: 0 6px 18px rgb(0 0 0 / 14%);
+  --al-glow-live: 0 0 6px rgb(0 107 95 / 32%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --al-bg: #0e0f11;
+    --al-surface: #15171a;
+    --al-surface-2: #1b1e22;
+    --al-surface-raised: #21252a;
+    --al-surface-sunken: #0b0c0e;
+    --al-ink: #e9ebee;
+    --al-ink-soft: #c7cbd2;
+    --al-ink-mute: #a7adb7;
+    --al-ink-faint: #969ca6;
+    --al-border: #34383e;
+    --al-border-strong: #4b5058;
+    --al-border-subtle: #26292e;
+    --al-live: #5eead4;
+    --al-live-dim: #2dd4bf;
+    --al-live-soft: #1a2e2a;
+    --al-annotation: #e6b980;
+    --al-annotation-soft: #2a2419;
+    --al-input-blue: #8ab4ff;
+    --al-warning: #f0c77b;
+    --al-warning-soft: #2a2419;
+    --al-danger: #ff9b9b;
+    --al-danger-soft: #2a1a1a;
+    --al-ok: #5eead4;
+    --al-focus: #6ee7d6;
+    --al-on-accent: #071513;
+    --al-shadow-pop: 0 12px 40px rgb(0 0 0 / 55%);
+    --al-shadow-sticky: 0 6px 18px rgb(0 0 0 / 40%);
+    --al-glow-live: 0 0 6px rgb(94 234 212 / 60%);
+  }
+}

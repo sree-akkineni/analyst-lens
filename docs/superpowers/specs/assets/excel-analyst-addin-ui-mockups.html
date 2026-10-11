@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Analyst Lens — UI Mockups</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg:#eef2f5;
+      --surface:#ffffff;
+      --surface-2:#f7f9fb;
+      --ink:#15202b;
+      --muted:#657383;
+      --line:#d9e0e7;
+      --green:#107c41;
+      --green-soft:#e9f6ef;
+      --blue:#2457c5;
+      --blue-soft:#edf3ff;
+      --amber:#a86400;
+      --amber-soft:#fff5da;
+      --red:#b42318;
+      --red-soft:#fff0ee;
+      --shadow:0 18px 48px rgba(25,39,52,.12);
+      --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      --sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); }
+    button { font:inherit; }
+    .page { max-width:1460px; margin:0 auto; padding:28px; }
+    .page-head { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:20px; }
+    h1 { margin:0 0 5px; font-size:28px; letter-spacing:-.03em; }
+    .sub { color:var(--muted); font-size:13px; }
+    .status { display:flex; align-items:center; gap:8px; color:var(--muted); font-size:12px; }
+    .dot { width:8px; height:8px; border-radius:99px; background:#23a36d; box-shadow:0 0 0 4px #dff4eb; }
+    .tabs { display:flex; gap:7px; overflow:auto; padding:4px; border:1px solid var(--line); border-radius:12px; background:rgba(255,255,255,.72); margin-bottom:16px; }
+    .tab { border:0; border-radius:8px; padding:9px 13px; color:var(--muted); background:transparent; cursor:pointer; white-space:nowrap; font-size:12px; font-weight:700; }
+    .tab.active { color:#fff; background:#1e2937; }
+    .mock { display:none; }
+    .mock.active { display:block; }
+    .excel { min-height:760px; background:var(--surface); border:1px solid #cbd3dc; border-radius:15px; box-shadow:var(--shadow); overflow:hidden; }
+    .excel-title { height:38px; display:flex; align-items:center; justify-content:space-between; padding:0 14px; color:#fff; background:var(--green); font-size:12px; }
+    .traffic { display:flex; gap:7px; }
+    .traffic i { width:10px; height:10px; display:block; border-radius:50%; background:#ff635c; }
+    .traffic i:nth-child(2){background:#ffbf42}.traffic i:nth-child(3){background:#30c653}
+    .ribbon { height:74px; border-bottom:1px solid var(--line); background:#fbfcfd; padding:9px 13px; display:flex; align-items:center; gap:15px; }
+    .ribbon-group { display:flex; align-items:center; gap:7px; padding-right:14px; border-right:1px solid var(--line); }
+    .ribbon-group:last-child { border-right:0; }
+    .rib { width:32px; height:32px; border:1px solid var(--line); border-radius:7px; display:flex; align-items:center; justify-content:center; background:#fff; color:#344354; font-size:11px; font-weight:800; }
+    .rib.green { color:var(--green); border-color:#9ccdb4; background:var(--green-soft); }
+    .formula-bar { height:36px; display:flex; align-items:center; gap:8px; border-bottom:1px solid var(--line); padding:0 10px; font-size:11px; background:#fff; }
+    .name-box { width:68px; border:1px solid var(--line); border-radius:4px; padding:4px 7px; font-family:var(--mono); }
+    .fx { color:var(--green); font-style:italic; font-weight:800; }
+    .formula-input { flex:1; border:1px solid var(--line); border-radius:4px; padding:4px 7px; font-family:var(--mono); }
+    .workspace { display:grid; grid-template-columns:minmax(520px,1fr) minmax(390px,44%); min-height:610px; }
+    .sheet { position:relative; overflow:hidden; background:#fff; border-right:1px solid var(--line); }
+    .grid { display:grid; grid-template-columns:38px 145px repeat(6,98px); grid-auto-rows:31px; font-size:10px; }
+    .cell { border-right:1px solid #e3e8ee; border-bottom:1px solid #e3e8ee; padding:7px 8px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+    .hdr { background:#f2f4f7; color:#617080; text-align:center; font-weight:700; }
+    .rowhdr { background:#f2f4f7; color:#617080; text-align:center; padding:7px 0; }
+    .label { font-weight:700; }
+    .input { color:#2457c5; }
+    .link { color:#0b8c43; }
+    .calc { color:#181f27; }
+    .selected { outline:2px solid var(--green); outline-offset:-2px; background:#eff9f3; position:relative; z-index:2; }
+    .section-row { background:#eaf2ee; font-weight:800; border-bottom-color:#bad2c4; }
+    .subtotal { border-top:1px solid #2f4051; font-weight:800; }
+    .pane { background:var(--surface-2); overflow:auto; }
+    .pane-head { position:sticky; top:0; z-index:5; display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid var(--line); background:rgba(247,249,251,.95); backdrop-filter:blur(10px); }
+    .brand { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:800; }
+    .lens { width:23px; height:23px; border-radius:7px; background:var(--green); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; }
+    .kbd { display:inline-flex; padding:2px 5px; border:1px solid #bec8d2; border-bottom-width:2px; border-radius:4px; background:#fff; color:#4b5968; font:9px var(--mono); }
+    .pane-body { padding:13px; }
+    .crumb { display:flex; flex-wrap:wrap; gap:5px; align-items:center; margin-bottom:9px; color:var(--muted); font:10px var(--mono); }
+    .crumb b { color:#9aa7b3; }
+    .formula-card { border-radius:9px; background:#172233; color:#e8edf5; padding:11px 12px; font:11px/1.55 var(--mono); overflow:auto; }
+    .tok-fn { color:#c5a3ff; }.tok-ref{color:#7dd3fc}.tok-num{color:#ffd166}.tok-op{color:#cbd5e1}
+    .meta-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0 7px; }
+    .address { font:700 11px var(--mono); }
+    .value { font-size:19px; font-weight:800; }
+    .badges { display:flex; flex-wrap:wrap; gap:5px; }
+    .badge { display:inline-flex; align-items:center; gap:4px; padding:4px 7px; border-radius:999px; background:#e8edf3; color:#526171; font-size:9px; font-weight:800; }
+    .badge.warn { background:var(--amber-soft); color:var(--amber); }.badge.risk{background:var(--red-soft);color:var(--red)}.badge.ok{background:var(--green-soft);color:var(--green)}
+    .section { margin-top:13px; }
+    .section-title { display:flex; align-items:center; justify-content:space-between; color:#526171; font-size:9px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; margin-bottom:7px; }
+    .ref-list { border:1px solid var(--line); border-radius:9px; overflow:hidden; background:#fff; }
+    .ref { display:grid; grid-template-columns:minmax(0,1fr) auto auto; align-items:center; gap:8px; padding:8px 9px; border-bottom:1px solid var(--line); font-size:10px; }
+    .ref:last-child { border-bottom:0; }.ref:hover{background:#f5f8fa}
+    .ref-main { min-width:0; }.ref-addr{font:700 10px var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ref-name{color:var(--muted);margin-top:2px}
+    .ref-val { font-weight:800; white-space:nowrap; }
+    .btn { border:1px solid var(--line); border-radius:7px; padding:6px 8px; background:#fff; color:#344354; font-size:10px; font-weight:800; cursor:pointer; }
+    .btn.primary { background:var(--green); color:#fff; border-color:var(--green); }.btn.ghost{background:transparent}
+    .actions { display:flex; flex-wrap:wrap; gap:6px; margin-top:11px; }
+    .mini-map { position:relative; height:150px; border:1px solid var(--line); border-radius:9px; overflow:hidden; background-image:radial-gradient(#d1d9e1 1px,transparent 1px); background-size:14px 14px; background-color:#fff; }
+    .node { position:absolute; z-index:2; border:1px solid #9caabd; border-radius:6px; padding:5px 7px; background:#fff; color:#28384a; font:700 9px var(--mono); box-shadow:0 2px 6px rgba(25,39,52,.08); }
+    .node.current { background:#fff3bd; border-color:#d3a300; }.node.inputn{color:var(--blue);}.node.outputn{color:var(--green)}
+    .edge { position:absolute; z-index:1; height:2px; background:#98a7b8; transform-origin:left center; }
+    .compare { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+    .compare-card { border:1px solid var(--line); border-radius:8px; background:#fff; padding:7px; font-size:9px; }
+    .compare-card strong { display:block; font:700 9px var(--mono); margin-bottom:4px; }.compare-card.ok{border-color:#96c9af;background:#f1faf5}.compare-card.bad{border-color:#e1b0aa;background:#fff5f3}
+    .graph-toolbar { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:9px; }
+    .search { flex:1; min-width:130px; border:1px solid var(--line); border-radius:7px; padding:7px 9px; background:#fff; font-size:10px; }
+    .big-graph { position:relative; min-height:520px; border:1px solid var(--line); border-radius:10px; overflow:hidden; background-image:radial-gradient(#d0d8e1 1px,transparent 1px); background-size:18px 18px; background-color:#fff; }
+    .graph-note { position:absolute; left:12px; bottom:12px; padding:7px 9px; border:1px solid var(--line); border-radius:7px; background:rgba(255,255,255,.94); color:var(--muted); font-size:9px; }
+    .scan-summary { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+    .metric { border:1px solid var(--line); border-radius:9px; background:#fff; padding:9px; }.metric span{display:block;color:var(--muted);font-size:9px}.metric strong{display:block;margin-top:3px;font-size:19px}
+    .progress { height:7px; border-radius:99px; background:#e2e8ee; overflow:hidden; margin-top:8px; }.progress i{display:block;height:100%;width:72%;background:var(--green)}
+    .filters { display:flex; flex-wrap:wrap; gap:6px; margin:11px 0 8px; }
+    .finding { display:grid; grid-template-columns:10px minmax(0,1fr) auto; gap:9px; align-items:start; border:1px solid var(--line); border-radius:9px; background:#fff; padding:9px; margin-bottom:7px; }
+    .sev { width:9px; height:9px; border-radius:50%; margin-top:3px; background:#e1a900; }.sev.high{background:#d63b32}.sev.low{background:#448fd6}
+    .finding h4 { margin:0 0 3px; font-size:10px; }.finding p{margin:0;color:var(--muted);font-size:9px;line-height:1.45}.finding code{font:9px var(--mono);color:#3d4b5a}
+    .watch-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+    .watch { border:1px solid var(--line); border-radius:10px; background:#fff; padding:10px; }.watch-top{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:9px}.watch-val{font-size:22px;font-weight:850;margin:7px 0 3px}.delta{font-size:9px;font-weight:800}.delta.up{color:var(--green)}.delta.down{color:var(--red)}
+    .impact { margin-top:10px; border:1px solid #a6c6b4; border-radius:10px; background:var(--green-soft); padding:10px; font-size:10px; }
+    .command-search { display:flex; gap:7px; }.command-search input{flex:1;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff;font-size:10px}
+    .command { display:grid; grid-template-columns:26px minmax(0,1fr) auto; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--line); font-size:10px; }.cmd-icon{width:25px;height:25px;border-radius:7px;background:#eaf0f6;display:flex;align-items:center;justify-content:center;font-weight:900}.cmd-title{font-weight:800}.cmd-desc{color:var(--muted);font-size:9px;margin-top:2px}
+    .setting { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:1px solid var(--line); font-size:10px; }.toggle{width:31px;height:18px;border-radius:99px;background:var(--green);padding:2px;display:flex;justify-content:flex-end}.toggle i{display:block;width:14px;height:14px;border-radius:50%;background:#fff}
+    .diff-head { display:grid; grid-template-columns:1fr 28px 1fr; gap:7px; align-items:center; }.selectbox{border:1px solid var(--line);border-radius:8px;background:#fff;padding:9px;font-size:10px}.arrow{text-align:center;color:var(--muted)}
+    .diff-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin:10px 0; }.diff-stat{border:1px solid var(--line);border-radius:9px;background:#fff;padding:9px}.diff-stat strong{display:block;font-size:17px}.diff-stat span{font-size:9px;color:var(--muted)}
+    .diff-row { display:grid; grid-template-columns:86px minmax(0,1fr) minmax(0,1fr); gap:7px; border:1px solid var(--line); border-radius:9px; background:#fff; padding:8px; margin-bottom:6px; font-size:9px; }.diff-row code{font:9px/1.4 var(--mono);overflow-wrap:anywhere}.old{background:#fff2f0;padding:5px;border-radius:5px}.new{background:#eef9f3;padding:5px;border-radius:5px}
+    .footnote { margin-top:14px; color:var(--muted); font-size:11px; line-height:1.5; }
+    @media(max-width:980px){.workspace{grid-template-columns:1fr}.sheet{display:none}.pane{min-height:650px}.page{padding:14px}.scan-summary{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="page-head">
+      <div><h1>Analyst Lens UI system</h1><div class="sub">Approved Hybrid Inspector expanded into the six planned product surfaces.</div></div>
+      <div class="status"><span class="dot"></span>Static review mockup · Excel for Mac</div>
+    </div>
+    <nav class="tabs" aria-label="Mockup screens">
+      <button class="tab active" data-target="inspector">Inspector</button>
+      <button class="tab" data-target="graph">Full graph</button>
+      <button class="tab" data-target="scan">Health scan</button>
+      <button class="tab" data-target="watchlist">Watchlist</button>
+      <button class="tab" data-target="commands">Commands & settings</button>
+      <button class="tab" data-target="diff">Model diff · P1</button>
+    </nav>
+
+    <section class="mock active" id="inspector">
+      <div class="excel">
+        <div class="excel-title"><div class="traffic"><i></i><i></i><i></i></div><strong>Project Atlas — IC Model.xlsx</strong><span>Excel 16.111</span></div>
+        <div class="ribbon"><div class="ribbon-group"><div class="rib green">AL</div><small>Analyst<br>Lens</small></div><div class="ribbon-group"><div class="rib">A</div><div class="rib input">123</div><div class="rib link">↗</div><small>Format</small></div><div class="ribbon-group"><div class="rib">＋</div><div class="rib">−</div><small>Group</small></div><div class="ribbon-group"><div class="rib">←</div><div class="rib">→</div><small>Trace</small></div><div class="ribbon-group"><div class="rib">✓</div><small>Scan</small></div></div>
+        <div class="formula-bar"><span class="name-box">M31</span><span class="fx">fx</span><span class="formula-input">=IFERROR((M18-M24)/M18,0)</span></div>
+        <div class="workspace">
+          <div class="sheet"><div class="grid" id="sheet-grid"></div></div>
+          <aside class="pane">
+            <div class="pane-head"><div class="brand"><span class="lens">AL</span>Formula Inspector</div><span class="kbd">⌃⌥I</span></div>
+            <div class="pane-body">
+              <div class="crumb"><span>Operating Model!F42</span><b>›</b><span>Debt!J18</span><b>›</b><strong>Returns!M31</strong></div>
+              <div class="formula-card"><span class="tok-fn">IFERROR</span><span class="tok-op">((</span><span class="tok-ref">M18</span><span class="tok-op">−</span><span class="tok-ref">M24</span><span class="tok-op">)/</span><span class="tok-ref">M18</span><span class="tok-op">,</span><span class="tok-num">0</span><span class="tok-op">)</span></div>
+              <div class="meta-row"><div><div class="address">Returns!M31</div><div class="badges" style="margin-top:5px"><span class="badge warn">Cross-sheet upstream</span><span class="badge">2 direct inputs</span></div></div><div class="value">24.7%</div></div>
+              <div class="section"><div class="section-title"><span>Direct precedents</span><span>2</span></div><div class="ref-list"><div class="ref"><div class="ref-main"><div class="ref-addr input">Returns!M18</div><div class="ref-name">Levered proceeds</div></div><div class="ref-val">$84.2m</div><span class="kbd">⌥←</span></div><div class="ref"><div class="ref-main"><div class="ref-addr">Returns!M24</div><div class="ref-name">Invested equity</div></div><div class="ref-val">$63.4m</div><span class="kbd">⌥→</span></div></div></div>
+              <div class="section"><div class="section-title"><span>Direct dependents</span><span>3</span></div><div class="ref-list"><div class="ref"><div class="ref-main"><div class="ref-addr link">IC Summary!G12</div><div class="ref-name">Base-case IRR</div></div><div class="ref-val">24.7%</div><span class="badge ok">Pinned</span></div><div class="ref"><div class="ref-main"><div class="ref-addr">Sensitivity!F9</div><div class="ref-name">Exit multiple table</div></div><div class="ref-val">1.8x</div><span class="kbd">⌥↓</span></div></div></div>
+              <div class="section"><div class="section-title"><span>Neighbor consistency</span><span class="badge ok">3 of 4 match</span></div><div class="compare"><div class="compare-card ok"><strong>L31</strong>Same normalized formula</div><div class="compare-card ok"><strong>M31</strong>Current cell</div><div class="compare-card bad"><strong>N31</strong>Hardcoded 23.0%</div></div></div>
+              <div class="section"><div class="section-title"><span>Orientation map</span><button class="btn ghost">Open full map</button></div><div class="mini-map"><div class="edge" style="left:22%;top:31%;width:28%;transform:rotate(22deg)"></div><div class="edge" style="left:22%;top:75%;width:28%;transform:rotate(-24deg)"></div><div class="edge" style="left:54%;top:50%;width:27%;transform:rotate(-24deg)"></div><div class="edge" style="left:54%;top:53%;width:27%;transform:rotate(22deg)"></div><div class="node inputn" style="left:4%;top:14%">M18 · $84.2m</div><div class="node" style="left:4%;top:68%">M24 · $63.4m</div><div class="node current" style="left:39%;top:42%">M31 · 24.7%</div><div class="node outputn" style="right:3%;top:14%">IC!G12</div><div class="node" style="right:3%;top:70%">Sens!F9</div></div></div>
+              <div class="actions"><button class="btn">← Back</button><button class="btn">Next →</button><button class="btn">Trace arrows</button><button class="btn primary">Pin output</button></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="mock" id="graph">
+      <div class="excel"><div class="excel-title"><div class="traffic"><i></i><i></i><i></i></div><strong>Project Atlas — IC Model.xlsx</strong><span>Dependency graph</span></div><div class="workspace" style="grid-template-columns:minmax(420px,.72fr) minmax(620px,1.28fr)"><div class="sheet"><div class="grid" id="sheet-grid-2"></div></div><aside class="pane"><div class="pane-head"><div class="brand"><span class="lens">AL</span>Dependency Graph</div><span class="badge">18 nodes · 22 edges</span></div><div class="pane-body"><div class="crumb"><span>Origin: Returns!M31</span><b>›</b><span>Upstream 2 levels</span><b>+</b><span>Downstream 1 level</span></div><div class="graph-toolbar"><input class="search" value="Search sheet, cell, or name"><button class="btn">Upstream +1</button><button class="btn">Downstream +1</button><button class="btn">Fit</button><button class="btn">Origin</button></div><div class="big-graph"><div class="edge" style="left:18%;top:18%;width:26%;transform:rotate(25deg)"></div><div class="edge" style="left:19%;top:62%;width:26%;transform:rotate(-18deg)"></div><div class="edge" style="left:47%;top:42%;width:22%;transform:rotate(-19deg)"></div><div class="edge" style="left:47%;top:46%;width:22%;transform:rotate(20deg)"></div><div class="edge" style="left:10%;top:80%;width:36%;transform:rotate(-55deg);background:#d28a00"></div><div class="node inputn" style="left:4%;top:9%">Revenue!M18<br>$84.2m</div><div class="node" style="left:4%;top:55%">Costs!M24<br>$63.4m</div><div class="node" style="left:5%;top:81%;border-color:#d28a00">Debt!J18<br>dynamic ref</div><div class="node current" style="left:40%;top:38%">Returns!M31<br>24.7%</div><div class="node outputn" style="right:5%;top:15%">IC Summary!G12<br>24.7%</div><div class="node" style="right:5%;top:68%">Sensitivity!F9<br>1.8x</div><div class="node inputn" style="left:7%;top:33%">Assumptions!D8<br>6.0x</div><div class="node" style="left:28%;top:12%">Exit!M14<br>$505m</div><div class="graph-note">Click a node to jump. Double-click to expand. Dynamic references remain explicit leaf nodes.</div></div><div class="actions"><span class="badge warn">1 unresolved dynamic edge</span><span class="badge ok">0 cycles</span><span class="badge">Cap 18 / 500</span></div></div></aside></div></div>
+    </section>
+
+    <section class="mock" id="scan">
+      <div class="excel"><div class="excel-title"><div class="traffic"><i></i><i></i><i></i></div><strong>Project Atlas — IC Model.xlsx</strong><span>Model health</span></div><div class="workspace"><div class="sheet"><div class="grid" id="sheet-grid-3"></div></div><aside class="pane"><div class="pane-head"><div class="brand"><span class="lens">AL</span>Model Health Scan</div><button class="btn primary">Run scan</button></div><div class="pane-body"><div class="scan-summary"><div class="metric"><span>High</span><strong style="color:var(--red)">4</strong></div><div class="metric"><span>Medium</span><strong style="color:var(--amber)">11</strong></div><div class="metric"><span>Low</span><strong style="color:#397bb8">8</strong></div><div class="metric"><span>Scanned</span><strong>72%</strong></div></div><div class="progress"><i></i></div><div class="actions"><span class="badge">58,412 / 81,067 cells</span><button class="btn">Cancel</button></div><div class="filters"><button class="btn primary">All 23</button><button class="btn">High 4</button><button class="btn">Formula runs</button><button class="btn">External links</button><button class="btn">Returns</button></div><div class="finding"><span class="sev high"></span><div><h4>Hardcode interrupts repeated formula run</h4><p><code>Returns!N31</code> contains <code>23.0%</code> while L31, M31, and O31 contain normalized copies of the same formula.</p></div><button class="btn">Go</button></div><div class="finding"><span class="sev high"></span><div><h4>Closed external workbook dependency</h4><p><code>Debt!J18</code> references <code>[Lender Case.xlsx]Terms!$D$19</code>. Open the source workbook to inspect further.</p></div><button class="btn">Go</button></div><div class="finding"><span class="sev"></span><div><h4>Numeric constant embedded in formula</h4><p><code>Operating Model!F42</code> includes <code>365</code>. Safe constants exclude 0, 1, and -1 only.</p></div><button class="btn">Go</button></div><div class="finding"><span class="sev"></span><div><h4>Volatile dynamic reference</h4><p><code>Debt!J18</code> uses <code>INDIRECT</code>; the graph may not resolve its target statically.</p></div><button class="btn">Go</button></div><div class="finding"><span class="sev low"></span><div><h4>Inconsistent number format</h4><p><code>Returns!M31</code> uses 0.0% while the comparison row uses 0.00%.</p></div><button class="btn">Go</button></div><div class="actions"><button class="btn">Export Markdown report</button><span class="badge ok">Read-only scan</span></div></div></aside></div></div>
+    </section>
+
+    <section class="mock" id="watchlist">
+      <div class="excel"><div class="excel-title"><div class="traffic"><i></i><i></i><i></i></div><strong>Project Atlas — IC Model.xlsx</strong><span>Key outputs</span></div><div class="workspace"><div class="sheet"><div class="grid" id="sheet-grid-4"></div></div><aside class="pane"><div class="pane-head"><div class="brand"><span class="lens">AL</span>Key Output Watchlist</div><button class="btn primary">Pin selected cell</button></div><div class="pane-body"><div class="badges"><span class="badge ok">6 pinned</span><span class="badge">Session only</span><span class="badge">Refreshed 2s ago</span></div><div class="section"><div class="section-title"><span>Returns</span><span>3</span></div><div class="watch-grid"><div class="watch"><div class="watch-top"><span>Base IRR</span><code>IC!G12</code></div><div class="watch-val">24.7%</div><div class="delta up">▲ 1.2 pts from prior calc</div></div><div class="watch"><div class="watch-top"><span>MOIC</span><code>IC!G13</code></div><div class="watch-val">1.84x</div><div class="delta up">▲ 0.06x</div></div><div class="watch"><div class="watch-top"><span>Downside IRR</span><code>IC!H12</code></div><div class="watch-val">14.2%</div><div class="delta down">▼ 0.4 pts</div></div><div class="watch"><div class="watch-top"><span>Exit leverage</span><code>Debt!M27</code></div><div class="watch-val">2.1x</div><div class="delta up">▼ 0.2x leverage</div></div></div></div><div class="impact"><strong>Selected assumption affects 3 pinned outputs</strong><p style="margin:5px 0 0;color:#315d44">Exit multiple → Base IRR, MOIC, Downside IRR. Expand the impact path in the dependency graph.</p><button class="btn primary" style="margin-top:8px">Show impact graph</button></div><div class="section"><div class="section-title"><span>Formula integrity</span><span class="badge warn">1 changed</span></div><div class="ref-list"><div class="ref"><div class="ref-main"><div class="ref-addr">IC Summary!G12</div><div class="ref-name">Value moved; formula unchanged</div></div><span class="badge ok">Expected</span><button class="btn">View</button></div><div class="ref"><div class="ref-main"><div class="ref-addr">Debt!M27</div><div class="ref-name">Formula changed since pin</div></div><span class="badge warn">Review</span><button class="btn">Diff</button></div></div></div><div class="actions"><button class="btn">Save with workbook…</button><button class="btn">Export snapshot</button></div></div></aside></div></div>
+    </section>
+
+    <section class="mock" id="commands">
+      <div class="excel"><div class="excel-title"><div class="traffic"><i></i><i></i><i></i></div><strong>Project Atlas — IC Model.xlsx</strong><span>Commands & settings</span></div><div class="workspace"><div class="sheet"><div class="grid" id="sheet-grid-5"></div></div><aside class="pane"><div class="pane-head"><div class="brand"><span class="lens">AL</span>Commands & Settings</div><span class="badge ok">Local host healthy</span></div><div class="pane-body"><div class="command-search"><input value="format"><button class="btn">Clear</button></div><div class="section"><div class="section-title"><span>Commands</span><span>12 matches</span></div><div class="command"><span class="cmd-icon" style="color:var(--blue)">A</span><div><div class="cmd-title">Format as input</div><div class="cmd-desc">Blue font; preserve all other properties</div></div><span class="kbd">⌃⌥B</span></div><div class="command"><span class="cmd-icon">$</span><div><div class="cmd-title">Currency · zero as dash</div><div class="cmd-desc">Parentheses negatives, one decimal</div></div><span class="kbd">⌃⌥$</span></div><div class="command"><span class="cmd-icon">%</span><div><div class="cmd-title">Percentage · one decimal</div><div class="cmd-desc">Preserve underlying values</div></div><span class="kbd">⌃⌥%</span></div><div class="command"><span class="cmd-icon">↶</span><div><div class="cmd-title">Revert last Analyst Lens action</div><div class="cmd-desc">Restores exact captured properties</div></div><span class="kbd">⌃⌥Z</span></div></div><div class="section"><div class="section-title"><span>Modeling conventions</span></div><div class="setting"><span>Input font color</span><span class="badge" style="color:var(--blue)">#0000FF</span></div><div class="setting"><span>Linked formula color</span><span class="badge" style="color:var(--green)">#008000</span></div><div class="setting"><span>Negatives in parentheses</span><span class="toggle"><i></i></span></div><div class="setting"><span>Zero as dash</span><span class="toggle"><i></i></span></div><div class="setting"><span>Safe numeric constants</span><code style="font:9px var(--mono)">-1, 0, 1</code></div></div><div class="section"><div class="section-title"><span>Privacy & runtime</span></div><div class="setting"><span>Workbook telemetry</span><span class="badge ok">Off · fixed</span></div><div class="setting"><span>Formula/value debug logs</span><span class="badge ok">Off</span></div><div class="setting"><span>App assets</span><span class="badge">127.0.0.1</span></div><div class="setting"><span>Office.js</span><span class="badge">Microsoft CDN</span></div><div class="actions"><button class="btn">Run connection check</button><button class="btn">Repair installation</button><button class="btn">Export settings</button></div></div></div></aside></div></div>
+    </section>
+
+    <section class="mock" id="diff">
+      <div class="excel"><div class="excel-title"><div class="traffic"><i></i><i></i><i></i></div><strong>Project Atlas — IC Model.xlsx</strong><span>Model version comparison · P1</span></div><div class="workspace"><div class="sheet"><div class="grid" id="sheet-grid-6"></div></div><aside class="pane"><div class="pane-head"><div class="brand"><span class="lens">AL</span>Model Diff</div><button class="btn primary">Compare</button></div><div class="pane-body"><div class="diff-head"><div class="selectbox"><strong>Baseline</strong><br>Project Atlas v14.xlsx</div><div class="arrow">→</div><div class="selectbox"><strong>Revised</strong><br>Project Atlas v15.xlsx</div></div><div class="diff-stats"><div class="diff-stat"><strong>37</strong><span>Formula changes</span></div><div class="diff-stat"><strong>128</strong><span>Value changes</span></div><div class="diff-stat"><strong>3</strong><span>Pinned outputs affected</span></div></div><div class="filters"><button class="btn primary">Material paths</button><button class="btn">Formulas</button><button class="btn">Values</button><button class="btn">Formats</button><button class="btn">Structure</button></div><div class="diff-row"><strong>Returns!M31</strong><code class="old">=(M18-M24)/M18</code><code class="new">=IFERROR((M18-M24)/M18,0)</code></div><div class="diff-row"><strong>Debt!J18</strong><code class="old">='Lender Terms'!D19</code><code class="new">=INDIRECT(J17&amp;"!D19")</code></div><div class="diff-row"><strong>Assump!D8</strong><code class="old">5.5x</code><code class="new">6.0x</code></div><div class="impact"><strong>Material impact path</strong><p style="margin:5px 0">Assumptions!D8 → Exit!M14 → Returns!M18 → Returns!M31 → IC Summary!G12</p><button class="btn primary">Open path in graph</button></div><div class="section"><div class="section-title"><span>Change summary</span><span class="badge warn">Review</span></div><p style="font-size:10px;line-height:1.55;color:var(--muted)">Base-case IRR increased 1.2 points. The path is primarily driven by the exit multiple change. Debt!J18 also changed from a direct reference to a dynamic reference, reducing auditability.</p></div><div class="actions"><button class="btn">Export Markdown report</button><button class="btn">Ignore recalculation-only values</button></div></div></aside></div></div>
+    </section>
+
+    <p class="footnote">These mockups define information hierarchy and behavior, not final visual polish. The implementation must preserve keyboard access, read-only audit behavior, evidence-linked findings, lazy graph expansion, and the add-in-specific revert contract described in the PRD.</p>
+  </main>
+  <script>
+    const labels = ["Revenue", "COGS", "Gross profit", "EBITDA", "Cash taxes", "Free cash flow", "Debt paydown", "Exit proceeds", "Invested equity", "MOIC", "IRR"];
+    function populate(id) {
+      const el = document.getElementById(id); if (!el) return;
+      const cells = [];
+      cells.push('<div class="cell hdr"></div>');
+      ['A','B','C','D','E','F','G'].forEach(x=>cells.push(`<div class="cell hdr">${x}</div>`));
+      for (let r=18;r<=31;r++) {
+        cells.push(`<div class="cell rowhdr">${r}</div>`);
+        for (let c=0;c<7;c++) {
+          const isSection = r===18 || r===27;
+          const lab = c===0 ? (labels[(r-18)%labels.length] || '') : '';
+          let value = lab || (c===6 && r===31 ? '24.7%' : c>1 ? (r%3===0 ? '—' : '$'+(32+r+c)+'.'+c+'m') : '');
+          const cls = ['cell', isSection?'section-row':'', c===6&&r===31?'selected':'', r===24||r===31?'subtotal':'', c===1&&r%4===0?'input':'', c===3&&r%5===0?'link':'calc'].filter(Boolean).join(' ');
+          cells.push(`<div class="${cls}">${value}</div>`);
+        }
+      }
+      el.innerHTML = cells.join('');
+    }
+    ['sheet-grid','sheet-grid-2','sheet-grid-3','sheet-grid-4','sheet-grid-5','sheet-grid-6'].forEach(populate);
+    document.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>{
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.mock').forEach(x=>x.classList.remove('active'));
+      tab.classList.add('active'); document.getElementById(tab.dataset.target).classList.add('active');
+    }));
+  </script>
+</body>
+</html>

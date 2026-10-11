@@ -1,0 +1,211 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.25/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.25",
+  "version": "0.1.0",
+  "id": "5db4c51e-9c38-4d8b-976b-2d0f707e27f5",
+  "developer": {
+    "name": "Analyst Lens",
+    "websiteUrl": "https://127.0.0.1:43119/taskpane.html",
+    "privacyUrl": "https://127.0.0.1:43119/taskpane.html",
+    "termsOfUseUrl": "https://127.0.0.1:43119/taskpane.html"
+  },
+  "name": {
+    "short": "Analyst Lens",
+    "full": "Analyst Lens for Excel"
+  },
+  "description": {
+    "short": "A local, keyboard-first analysis cockpit for Excel on Mac.",
+    "full": "Analyst Lens adds local formula inspection, navigation, auditing, and finance formatting workflows to Excel on Mac."
+  },
+  "icons": {
+    "outline": "public/icons/icon-32.png",
+    "color": "public/icons/icon-192.png"
+  },
+  "accentColor": "#17324D",
+  "authorization": {
+    "permissions": {
+      "resourceSpecific": [
+        {
+          "name": "Document.ReadWrite.User",
+          "type": "Delegated"
+        }
+      ]
+    }
+  },
+  "validDomains": [
+    "127.0.0.1"
+  ],
+  "extensions": [
+    {
+      "requirements": {
+        "scopes": [
+          "workbook"
+        ],
+        "formFactors": [
+          "desktop"
+        ]
+      },
+      "runtimes": [
+        {
+          "requirements": {
+            "capabilities": [
+              {
+                "name": "AddinCommands",
+                "minVersion": "1.1"
+              },
+              {
+                "name": "SharedRuntime",
+                "minVersion": "1.1"
+              }
+            ]
+          },
+          "id": "AnalystLensSharedRuntime",
+          "type": "general",
+          "code": {
+            "page": "https://127.0.0.1:43119/taskpane.html"
+          },
+          "lifetime": "long",
+          "actions": [
+            {
+              "id": "OpenAnalystLens",
+              "type": "openPage",
+              "pinnable": true
+            },
+            {
+              "id": "OpenQuickTracePrecedents",
+              "type": "executeFunction"
+            },
+            {
+              "id": "OpenQuickTraceDependents",
+              "type": "executeFunction"
+            }
+          ]
+        }
+      ],
+      "ribbons": [
+        {
+          "requirements": {
+            "capabilities": [
+              {
+                "name": "AddinCommands",
+                "minVersion": "1.1"
+              }
+            ],
+            "scopes": [
+              "workbook"
+            ],
+            "formFactors": [
+              "desktop"
+            ]
+          },
+          "contexts": [
+            "default"
+          ],
+          "tabs": [
+            {
+              "id": "AnalystLensTab",
+              "label": "Analyst Lens",
+              "groups": [
+                {
+                  "id": "AnalystLensGroup",
+                  "label": "Analyst Lens",
+                  "icons": [
+                    {
+                      "size": 16,
+                      "url": "https://127.0.0.1:43119/icons/icon-16.png"
+                    },
+                    {
+                      "size": 32,
+                      "url": "https://127.0.0.1:43119/icons/icon-32.png"
+                    },
+                    {
+                      "size": 80,
+                      "url": "https://127.0.0.1:43119/icons/icon-80.png"
+                    }
+                  ],
+                  "controls": [
+                    {
+                      "id": "OpenAnalystLensButton",
+                      "type": "button",
+                      "label": "Open Analyst Lens",
+                      "icons": [
+                        {
+                          "size": 16,
+                          "url": "https://127.0.0.1:43119/icons/icon-16.png"
+                        },
+                        {
+                          "size": 32,
+                          "url": "https://127.0.0.1:43119/icons/icon-32.png"
+                        },
+                        {
+                          "size": 80,
+                          "url": "https://127.0.0.1:43119/icons/icon-80.png"
+                        }
+                      ],
+                      "supertip": {
+                        "title": "Open Analyst Lens",
+                        "description": "Open the local Analyst Lens task pane."
+                      },
+                      "actionId": "OpenAnalystLens",
+                      "enabled": true
+                    },
+                    {
+                      "id": "OpenQuickTracePrecedentsButton",
+                      "type": "button",
+                      "label": "Quick Trace In",
+                      "icons": [
+                        {
+                          "size": 16,
+                          "url": "https://127.0.0.1:43119/icons/icon-16.png"
+                        },
+                        {
+                          "size": 32,
+                          "url": "https://127.0.0.1:43119/icons/icon-32.png"
+                        },
+                        {
+                          "size": 80,
+                          "url": "https://127.0.0.1:43119/icons/icon-80.png"
+                        }
+                      ],
+                      "supertip": {
+                        "title": "Quick Trace In",
+                        "description": "Open a floating precedent audit for the selected cell."
+                      },
+                      "actionId": "OpenQuickTracePrecedents",
+                      "enabled": true
+                    },
+                    {
+                      "id": "OpenQuickTraceDependentsButton",
+                      "type": "button",
+                      "label": "Quick Trace Out",
+                      "icons": [
+                        {
+                          "size": 16,
+                          "url": "https://127.0.0.1:43119/icons/icon-16.png"
+                        },
+                        {
+                          "size": 32,
+                          "url": "https://127.0.0.1:43119/icons/icon-32.png"
+                        },
+                        {
+                          "size": 80,
+                          "url": "https://127.0.0.1:43119/icons/icon-80.png"
+                        }
+                      ],
+                      "supertip": {
+                        "title": "Quick Trace Out",
+                        "description": "Open a floating dependent audit for the selected cell."
+                      },
+                      "actionId": "OpenQuickTraceDependents",
+                      "enabled": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

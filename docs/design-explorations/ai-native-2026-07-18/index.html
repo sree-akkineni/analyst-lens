@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Analyst Lens — AI-native directions</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    color: #1a1a1a;
+    background: #ececea;
+    -webkit-font-smoothing: antialiased;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px 16px 48px; }
+  .page { max-width: 1400px; margin: 0 auto; }
+  header { margin-bottom: 18px; }
+  header h1 { margin: 0 0 6px; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+  header p { margin: 0; color: #555; font-size: 13px; max-width: 72ch; line-height: 1.5; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; align-items: start; }
+  .frame { display: flex; flex-direction: column; gap: 8px; }
+  .frame-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #666; padding: 0 2px; display: flex; align-items: baseline; gap: 8px; }
+  .frame-label .tag { font-size: 10px; font-weight: 500; color: #999; text-transform: none; letter-spacing: 0; }
+  iframe { width: 100%; height: 720px; border: 1px solid #d4d4d0; border-radius: 8px; background: white; box-shadow: 0 1px 3px rgb(0 0 0 / 4%); }
+  .notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 14px; }
+  .note { background: white; border: 1px solid #d4d4d0; border-radius: 8px; padding: 14px 16px; font-size: 12.5px; line-height: 1.55; }
+  .note h3 { margin: 0 0 6px; font-size: 13px; font-weight: 700; letter-spacing: -0.005em; }
+  .note p { margin: 0 0 8px; color: #333; }
+  .note p:last-child { margin-bottom: 0; }
+  .note .inspo { color: #888; font-size: 11.5px; font-style: italic; }
+  .note ul { margin: 6px 0 0; padding-left: 16px; color: #333; }
+  .note li { margin-bottom: 3px; }
+  @media (max-width: 1100px) { .grid, .notes { grid-template-columns: 1fr; } iframe { height: 600px; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>Analyst Lens — three AI-native directions</h1>
+    <p>Same fixture data (DCF $F$42 IRR with precedents), three genuinely different aesthetics. Not iterations of the current UI — each is a distinct bet on what a finance-native AI copilot surface should feel like. All render at realistic taskpane width (380px) inside each iframe.</p>
+  </header>
+
+  <div class="grid">
+    <div class="frame">
+      <div class="frame-label">A — Command <span class="tag">launcher / task-app / keyboard-first</span></div>
+      <iframe src="./a-command.html"></iframe>
+    </div>
+    <div class="frame">
+      <div class="frame-label">B — Instrument <span class="tag">finance cockpit / data-dense cards / trading terminals</span></div>
+      <iframe src="./b-instrument.html"></iframe>
+    </div>
+    <div class="frame">
+      <div class="frame-label">C — Marginalia <span class="tag">Notion / Things / craft-editorial</span></div>
+      <iframe src="./c-marginalia.html"></iframe>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note">
+      <h3>A — Command</h3>
+      <p class="inspo">Launcher palette, task-app restraint, keyboard-first density.</p>
+      <p>Dark, single-column, command-forward. The selected cell is the hero; everything else is a contextual action or a scannable list row. Keyboard hints are first-class, not footer afterthoughts.</p>
+      <ul>
+        <li>Monospace numerals everywhere — finance tools earn trust through numbers</li>
+        <li>Precedents/dependents as a single unified list, kind-signaled by glyph not section headers</li>
+        <li>Bottom command bar is the primary action surface (⌘K pattern)</li>
+        <li>Zero section chrome — content breathes via spacing alone</li>
+      </ul>
+    </div>
+    <div class="note">
+      <h3>B — Instrument</h3>
+      <p class="inspo">Financial-cockpit hierarchy, data-dense cards, trading-terminal confidence.</p>
+      <p>Light, dense, instrument-panel. Big numeral readout, sparkline-shaped context, every pixel earning its place. Reads like a dashboard a CFO would glance at between meetings.</p>
+      <ul>
+        <li>Huge value numeral as the anchor — the cell's "answer" is the visual center</li>
+        <li>Context cards (formula, precedents, risk) as tiles in a modular grid</li>
+        <li>Inline sparkline strip for quick neighbor comparison</li>
+        <li>Status pill + staleness signal baked into the header</li>
+      </ul>
+    </div>
+    <div class="note">
+      <h3>C — Marginalia</h3>
+      <p class="inspo">Notion's editorial calm, Things 3's craft, the feeling of a well-annotated model.</p>
+      <p>Warm, paper-like, annotation-first. Treats the audit trail as the product — each precedent reads like a margin note. For analysts who think in narrative, not grids.</p>
+      <ul>
+        <li>Serif display for the cell address — nods to financial typesetting tradition</li>
+        <li>Precedents rendered as numbered annotations with source-workbook badges</li>
+        <li>Generous whitespace, hairline rules, no cards or boxes</li>
+        <li>Action surface collapses to a single intent line at the bottom</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</body>
+</html>

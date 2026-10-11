@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Analyst Lens Quick Trace — Design Review Mockup</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --excel: #217346;
+      --excel-dark: #185c37;
+      --ink: #17211b;
+      --muted: #657068;
+      --line: #d9dfdb;
+      --soft: #f4f7f5;
+      --select: #d9f0e3;
+      --select-line: #2d8659;
+      --blue: #2563a6;
+      --amber: #a86700;
+      --red: #b42318;
+      --shadow: 0 22px 60px rgb(23 33 27 / 28%), 0 3px 12px rgb(23 33 27 / 22%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 960px;
+      min-height: 760px;
+      color: var(--ink);
+      background: #dfe4e1;
+      overflow: hidden;
+    }
+    button { font: inherit; }
+    .review-note {
+      position: fixed;
+      z-index: 20;
+      top: 14px;
+      right: 18px;
+      max-width: 370px;
+      padding: 10px 13px;
+      border: 1px solid #c9d0cc;
+      border-radius: 8px;
+      color: #3e4942;
+      background: rgb(255 255 255 / 94%);
+      box-shadow: 0 4px 16px rgb(20 30 24 / 12%);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .excel {
+      position: absolute;
+      inset: 0;
+      background: white;
+    }
+    .titlebar {
+      height: 42px;
+      display: grid;
+      grid-template-columns: 120px 1fr 120px;
+      align-items: center;
+      padding: 0 14px;
+      color: white;
+      background: var(--excel-dark);
+      font-size: 12px;
+    }
+    .traffic { display: flex; gap: 7px; }
+    .traffic i { width: 11px; height: 11px; border-radius: 50%; background: #ff605c; }
+    .traffic i:nth-child(2) { background: #ffbd44; }
+    .traffic i:nth-child(3) { background: #00ca4e; }
+    .titlebar strong { text-align: center; font-weight: 600; }
+    .titlebar span:last-child { text-align: right; opacity: .82; }
+    .ribbon {
+      height: 104px;
+      display: flex;
+      align-items: flex-end;
+      gap: 24px;
+      padding: 14px 22px 13px;
+      border-bottom: 1px solid #c8ceca;
+      background: #f7f8f7;
+    }
+    .ribbon-group { display: grid; grid-template-columns: repeat(3, 36px); gap: 8px; align-items: end; }
+    .ribbon-group strong { grid-column: 1 / -1; color: #566159; font-size: 10px; font-weight: 500; text-align: center; }
+    .rib {
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #ccd3ce;
+      border-radius: 4px;
+      background: white;
+      color: #33463a;
+      font-weight: 650;
+    }
+    .rib.primary { color: white; border-color: var(--excel); background: var(--excel); }
+    .formula-bar {
+      height: 36px;
+      display: grid;
+      grid-template-columns: 90px 40px 1fr;
+      align-items: center;
+      border-bottom: 1px solid #cbd1cd;
+      color: #3b453f;
+      background: #fbfcfb;
+      font-size: 12px;
+    }
+    .name-box, .fx { height: 100%; display: grid; place-items: center; border-right: 1px solid #d5dad7; }
+    .fx { color: var(--excel); font-family: Georgia, serif; font-style: italic; }
+    .formula-text { padding: 0 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .sheet {
+      position: absolute;
+      inset: 182px 0 34px 0;
+      overflow: hidden;
+      background:
+        linear-gradient(#e1e5e2 1px, transparent 1px),
+        linear-gradient(90deg, #e1e5e2 1px, transparent 1px),
+        white;
+      background-size: 84px 27px;
+      padding: 48px 28px;
+    }
+    .model {
+      width: 880px;
+      display: grid;
+      grid-template-columns: 220px repeat(7, 94px);
+      grid-auto-rows: 27px;
+      font-size: 11px;
+    }
+    .cell {
+      padding: 6px 8px;
+      border-right: 1px solid #e1e5e2;
+      border-bottom: 1px solid #e1e5e2;
+      text-align: right;
+    }
+    .cell.label { text-align: left; }
+    .cell.head { color: white; background: var(--excel); font-weight: 650; }
+    .cell.subtotal { border-bottom: 2px solid #4d5b52; font-weight: 650; }
+    .cell.input { color: #1659c7; }
+    .cell.selected {
+      position: relative;
+      outline: 3px solid var(--excel);
+      outline-offset: -2px;
+      background: #f6fbf8;
+      z-index: 2;
+    }
+    .tabs {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 34px;
+      display: flex;
+      gap: 2px;
+      align-items: end;
+      padding-left: 55px;
+      border-top: 1px solid #ccd2ce;
+      background: #f4f5f4;
+    }
+    .tab { padding: 8px 24px 7px; border-bottom: 3px solid var(--excel); background: white; font-size: 11px; }
+
+    .dialog {
+      position: absolute;
+      z-index: 10;
+      left: 49%;
+      top: 235px;
+      width: 500px;
+      min-width: 420px;
+      min-height: 390px;
+      max-width: 680px;
+      max-height: 620px;
+      height: 455px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto auto;
+      overflow: auto;
+      resize: both;
+      border: 1px solid #8b958f;
+      border-radius: 9px;
+      background: white;
+      box-shadow: var(--shadow);
+    }
+    .dialog-title {
+      min-height: 38px;
+      display: grid;
+      grid-template-columns: 70px 1fr 70px;
+      align-items: center;
+      padding: 0 12px;
+      border-radius: 8px 8px 0 0;
+      color: white;
+      background: var(--excel-dark);
+      cursor: move;
+      user-select: none;
+      font-size: 12px;
+    }
+    .dialog-title strong { text-align: center; font-size: 13px; }
+    .dialog-title .lights { display: flex; gap: 6px; }
+    .dialog-title .lights i { width: 10px; height: 10px; border-radius: 50%; background: rgb(255 255 255 / 45%); }
+    .dialog-title .close-x { justify-self: end; color: white; border: 0; background: transparent; font-size: 18px; cursor: pointer; }
+    .trace-head { padding: 12px 14px 10px; border-bottom: 1px solid var(--line); }
+    .topline { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .segmented { display: inline-flex; padding: 2px; border-radius: 6px; background: #e7ece9; }
+    .segmented button {
+      padding: 6px 12px;
+      border: 0;
+      border-radius: 4px;
+      color: #425048;
+      background: transparent;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 650;
+    }
+    .segmented button.active { color: white; background: var(--excel); box-shadow: 0 1px 3px rgb(0 0 0 / 15%); }
+    .origin { color: var(--muted); font-size: 10px; }
+    .rootline { margin-top: 9px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .rootline strong { font-size: 12px; }
+    .rootline span { font: 650 15px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .formula {
+      margin-top: 7px;
+      padding: 7px 8px;
+      border-radius: 5px;
+      color: #334139;
+      background: var(--soft);
+      font: 10px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
+      overflow-wrap: anywhere;
+    }
+    .tree { min-height: 190px; overflow: auto; font-size: 11px; }
+    .tree-columns, .tree-row { display: grid; grid-template-columns: minmax(250px, 1fr) 100px; align-items: center; }
+    .tree-columns {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      height: 28px;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      background: #fbfcfb;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .tree-columns span:last-child { text-align: right; }
+    .tree-row {
+      min-height: 31px;
+      width: 100%;
+      padding: 0 12px;
+      border: 0;
+      border-bottom: 1px solid #edf0ee;
+      color: var(--ink);
+      background: white;
+      text-align: left;
+      cursor: default;
+    }
+    .tree-row:hover { background: #f5f8f6; }
+    .tree-row.selected { background: var(--select); box-shadow: inset 3px 0 var(--select-line); }
+    .tree-row.root { font-weight: 700; }
+    .ref { display: flex; align-items: center; min-width: 0; }
+    .indent-1 { padding-left: 18px; }
+    .indent-2 { padding-left: 40px; }
+    .chevron { width: 18px; color: #56635b; text-align: center; }
+    .address { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .value { text-align: right; font-variant-numeric: tabular-nums; }
+    .badge {
+      margin-left: 7px;
+      padding: 2px 5px;
+      border-radius: 8px;
+      color: var(--amber);
+      background: #fff3d6;
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .detail {
+      min-height: 36px;
+      padding: 7px 14px;
+      border-top: 1px solid var(--line);
+      color: #465149;
+      background: #fafbfa;
+      font: 9px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      overflow-wrap: anywhere;
+    }
+    .footer {
+      min-height: 47px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 12px;
+      border-top: 1px solid var(--line);
+      background: white;
+    }
+    .hints { color: var(--muted); font-size: 9px; line-height: 1.55; }
+    kbd {
+      display: inline-block;
+      min-width: 16px;
+      margin: 0 1px;
+      padding: 1px 4px;
+      border: 1px solid #c8ceca;
+      border-bottom-width: 2px;
+      border-radius: 3px;
+      color: #39463e;
+      background: #f8f9f8;
+      font: 8px ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-align: center;
+    }
+    .footer-actions { display: flex; gap: 6px; }
+    .btn {
+      padding: 6px 9px;
+      border: 1px solid #c8cfca;
+      border-radius: 5px;
+      color: #344239;
+      background: white;
+      cursor: pointer;
+      font-size: 9px;
+      font-weight: 650;
+    }
+    .btn.primary { color: white; border-color: var(--excel); background: var(--excel); }
+    .statusline {
+      position: absolute;
+      bottom: 7px;
+      left: 12px;
+      color: white;
+      font-size: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="review-note"><strong>Design review mockup</strong><br>This artifact demonstrates hierarchy, two-column data truthfulness, and the movable/resizable floating-window requirement. It is not production Office Dialog code.</div>
+  <main class="excel" aria-label="Illustrative Microsoft Excel window">
+    <div class="titlebar"><div class="traffic"><i></i><i></i><i></i></div><strong>Sample Model — QA copy.xlsx</strong><span>Excel 16.111</span></div>
+    <div class="ribbon">
+      <div class="ribbon-group"><div class="rib primary">AL</div><div class="rib">P</div><div class="rib">D</div><strong>Analyst Lens · Trace</strong></div>
+      <div class="ribbon-group"><div class="rib">A</div><div class="rib">%</div><div class="rib">$</div><strong>Number Format</strong></div>
+      <div class="ribbon-group"><div class="rib">←</div><div class="rib">→</div><div class="rib">⌂</div><strong>Navigation</strong></div>
+    </div>
+    <div class="formula-bar"><span class="name-box">H12</span><span class="fx">fx</span><span class="formula-text">=$F12*(H$5&gt;=$C$3)*$G12*(1+Assumptions!$C$22)/12</span></div>
+    <section class="sheet"><div class="model" id="model"></div></section>
+    <div class="tabs"><div class="tab">Staffing Schedule</div><div class="tab" style="border-color:#aeb7b1">Assumptions</div><div class="tab" style="border-color:#aeb7b1">Summary</div></div>
+    <div class="statusline">Ready</div>
+  </main>
+
+  <section class="dialog" id="dialog" aria-label="Analyst Lens Quick Trace mockup">
+    <div class="dialog-title" id="drag-handle">
+      <span class="lights"><i></i><i></i><i></i></span>
+      <strong>Analyst Lens · Quick Trace</strong>
+      <button class="close-x" aria-label="Close mockup">×</button>
+    </div>
+    <header class="trace-head">
+      <div class="topline">
+        <div class="segmented" aria-label="Trace direction">
+          <button class="active" data-mode="in">Trace In</button>
+          <button data-mode="out">Trace Out</button>
+        </div>
+        <span class="origin">Origin: Staffing Schedule!H12</span>
+      </div>
+      <div class="rootline"><strong>Staffing Schedule!H12</strong><span>0</span></div>
+      <div class="formula">=$F12*(H$5&gt;=$C$3)*$G12*(1+Assumptions!$C$22)/12</div>
+    </header>
+    <div class="tree" role="tree" aria-label="Trace In dependencies">
+      <div class="tree-columns"><span>Reference</span><span>Value</span></div>
+      <button class="tree-row root" role="treeitem" aria-expanded="true" aria-level="1" data-formula="=$F12*(H$5&gt;=$C$3)*$G12*(1+Assumptions!$C$22)/12"><span class="ref"><span class="chevron">▾</span><span class="address">Staffing Schedule!H12</span></span><span class="value">0</span></button>
+      <button class="tree-row selected" role="treeitem" aria-expanded="false" aria-level="2" data-formula="=1"><span class="ref indent-1"><span class="chevron">▸</span><span class="address">Staffing Schedule!F12</span></span><span class="value">1</span></button>
+      <button class="tree-row" role="treeitem" aria-expanded="false" aria-level="2" data-formula="=EOMONTH(G5,1)"><span class="ref indent-1"><span class="chevron">▸</span><span class="address">Staffing Schedule!H5</span></span><span class="value">Sep-26</span></button>
+      <button class="tree-row" role="treeitem" aria-expanded="false" aria-level="2" data-formula=""><span class="ref indent-1"><span class="chevron">▸</span><span class="address">Staffing Schedule!C3</span></span><span class="value">Sep-26</span></button>
+      <button class="tree-row" role="treeitem" aria-expanded="false" aria-level="2" data-formula=""><span class="ref indent-1"><span class="chevron">▸</span><span class="address">Staffing Schedule!G12</span></span><span class="value">198,400</span></button>
+      <button class="tree-row" role="treeitem" aria-expanded="false" aria-level="2" data-formula="=Benefits!C8+Payroll!C14"><span class="ref indent-1"><span class="chevron">▸</span><span class="address">Assumptions!C22</span></span><span class="value">15%</span></button>
+      <button class="tree-row" role="treeitem" aria-level="2" data-formula=""><span class="ref indent-1"><span class="chevron">•</span><span class="address">[Comp Benchmarks.xlsx]Rates!C7</span><span class="badge">External</span></span><span class="value">Unavailable</span></button>
+    </div>
+    <div class="detail" id="detail">Staffing Schedule!F12 · =1</div>
+    <footer class="footer">
+      <div class="hints"><kbd>↑</kbd><kbd>↓</kbd> Navigate &nbsp; <kbd>→</kbd> Expand &nbsp; <kbd>←</kbd> Back &nbsp; <kbd>↩</kbd> Re-root<br><kbd>T</kbd> Direction &nbsp; 7 / 500 nodes · Audit-only</div>
+      <div class="footer-actions"><button class="btn">Return to origin</button><button class="btn primary">Close</button></div>
+    </footer>
+  </section>
+
+  <script>
+    const labels = ["Headcount Schedule", "Employee active", "Start month", "Annual salary", "Monthly salary", "Benefits burden", "Total monthly cost", "", "Department subtotal", "", "Projected OpEx"];
+    const model = document.getElementById("model");
+    const cells = ["", "Jun-26", "Jul-26", "Aug-26", "Sep-26", "Oct-26", "Nov-26", "Dec-26"];
+    cells.forEach((value, index) => cells[index] = `<div class="cell head ${index === 0 ? "label" : ""}">${value}</div>`);
+    labels.forEach((label, row) => {
+      cells.push(`<div class="cell label ${row === 8 ? "subtotal" : ""}">${label}</div>`);
+      for (let column = 0; column < 7; column += 1) {
+        const selected = row === 6 && column === 3;
+        const input = row === 3 && column === 1;
+        const value = row === 0 ? (column < 3 ? "1" : "0") : row === 3 ? "198,400" : row === 5 ? "15.0%" : row === 6 ? (column < 3 ? "14,320" : "—") : row === 8 ? "61,050" : row === 10 ? "204,730" : "";
+        cells.push(`<div class="cell ${selected ? "selected" : ""} ${input ? "input" : ""} ${row === 8 ? "subtotal" : ""}">${value}</div>`);
+      }
+    });
+    model.innerHTML = cells.join("");
+
+    const dialog = document.getElementById("dialog");
+    const handle = document.getElementById("drag-handle");
+    let dragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+    handle.addEventListener("mousedown", (event) => {
+      if (event.target.closest("button")) return;
+      dragging = true;
+      offsetX = event.clientX - dialog.offsetLeft;
+      offsetY = event.clientY - dialog.offsetTop;
+    });
+    window.addEventListener("mousemove", (event) => {
+      if (!dragging) return;
+      dialog.style.left = `${Math.max(0, Math.min(innerWidth - 120, event.clientX - offsetX))}px`;
+      dialog.style.top = `${Math.max(42, Math.min(innerHeight - 80, event.clientY - offsetY))}px`;
+    });
+    window.addEventListener("mouseup", () => { dragging = false; });
+
+    document.querySelectorAll(".segmented button").forEach((button) => button.addEventListener("click", () => {
+      document.querySelectorAll(".segmented button").forEach((item) => item.classList.toggle("active", item === button));
+      document.querySelector(".tree").setAttribute("aria-label", button.dataset.mode === "in" ? "Trace In dependencies" : "Trace Out dependencies");
+    }));
+    document.querySelectorAll(".tree-row").forEach((row) => row.addEventListener("click", () => {
+      document.querySelectorAll(".tree-row").forEach((item) => item.classList.toggle("selected", item === row));
+      const address = row.querySelector(".address").textContent;
+      const formula = row.dataset.formula || "No formula loaded";
+      document.getElementById("detail").textContent = `${address} · ${formula}`;
+    }));
+  </script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+{
+  "branch": "codex/analyst-lens-ui-modernization",
+  "captures": [
+    {
+      "filename": "light/taskpane-narrow-formula.png",
+      "fixtureUrl": "http://127.0.0.1:4173/taskpane.html?fixture=sample-model",
+      "name": "taskpane-narrow-formula",
+      "sha256": "d21bf5dc48118bb8736034b2aed93f0572fac27fe0bf992738102aa3c996662b",
+      "theme": "light",
+      "viewport": {
+        "width": 360,
+        "height": 900
+      }
+    },
+    {
+      "filename": "light/taskpane-narrow-hardcode.png",
+      "fixtureUrl": "http://127.0.0.1:4173/taskpane.html?fixture=sample-model&selection=hardcode",
+      "name": "taskpane-narrow-hardcode",
+      "sha256": "37ba271b7e52f511c3afa81ec90fc358d19ab6367b67eb9bf399c1f8f9c2443c",
+      "theme": "light",
+      "viewport": {
+        "width": 360,
+        "height": 900
+      }
+    },
+    {
+      "filename": "light/taskpane-wide-formula.png",
+      "fixtureUrl": "http://127.0.0.1:4173/taskpane.html?fixture=sample-model",
+      "name": "taskpane-wide-formula",
+      "sha256": "ff478b7a9d5ae2d3e757b3658a4f7f639a41a879c0d4d834bdbcdedde0927e31",
+      "theme": "light",
+      "viewport": {
+        "width": 760,
+        "height": 900
+      }
+    },
+    {
+      "filename": "light/quick-trace-in-420x390.png",
+      "fixtureUrl": "http://127.0.0.1:4173/quick-trace.html?fixture=sample-model&direction=precedent",
+      "name": "quick-trace-in-420x390",
+      "sha256": "63cd7f7f3d18c7b3bd18a5d4593e3066f32b7bd1246f6c4331bc16479bd36a2a",
+      "theme": "light",
+      "viewport": {
+        "width": 420,
+        "height": 390
+      }
+    },
+    {
+      "filename": "light/quick-trace-in-900x700.png",
+      "fixtureUrl": "http://127.0.0.1:4173/quick-trace.html?fixture=sample-model&direction=precedent",
+      "name": "quick-trace-in-900x700",
+      "sha256": "0d0f446e283974d856fa092b9fcb47e5293af5f49ac8b7ef73588281f70c20f4",
+      "theme": "light",
+      "viewport": {
+        "width": 900,
+        "height": 700
+      }
+    },
+    {
+      "filename": "light/quick-trace-out-420x390.png",
+      "fixtureUrl": "http://127.0.0.1:4173/quick-trace.html?fixture=sample-model&direction=dependent",
+      "name": "quick-trace-out-420x390",
+      "sha256": "ca023f2db0b2020284377e711c9ad1ba93ff5a7fc321c441df5615e31daa8b5e",
+      "theme": "light",
+      "viewport": {
+        "width": 420,
+        "height": 390
+      }
+    },
+    {
+      "filename": "dark/taskpane-narrow-formula.png",
+      "fixtureUrl": "http://127.0.0.1:4173/taskpane.html?fixture=sample-model",
+      "name": "taskpane-narrow-formula",
+      "sha256": "c4aca9537406f81136eae8a98c674d98f1368168577163137e976b9195ad6972",
+      "theme": "dark",
+      "viewport": {
+        "width": 360,
+        "height": 900
+      }
+    },
+    {
+      "filename": "dark/taskpane-narrow-hardcode.png",
+      "fixtureUrl": "http://127.0.0.1:4173/taskpane.html?fixture=sample-model&selection=hardcode",
+      "name": "taskpane-narrow-hardcode",
+      "sha256": "3b6eb60b3765e8c1e563a622efd56f782154f7b41a78654ca1c5cccd97670fc0",
+      "theme": "dark",
+      "viewport": {
+        "width": 360,
+        "height": 900
+      }
+    },
+    {
+      "filename": "dark/taskpane-wide-formula.png",
+      "fixtureUrl": "http://127.0.0.1:4173/taskpane.html?fixture=sample-model",
+      "name": "taskpane-wide-formula",
+      "sha256": "83ca1134016aef77c72402f8f2c29043156fb0319e7c4c2aba969f5423b0d2d2",
+      "theme": "dark",
+      "viewport": {
+        "width": 760,
+        "height": 900
+      }
+    },
+    {
+      "filename": "dark/quick-trace-in-420x390.png",
+      "fixtureUrl": "http://127.0.0.1:4173/quick-trace.html?fixture=sample-model&direction=precedent",
+      "name": "quick-trace-in-420x390",
+      "sha256": "4dcc8334fef99f906090f2cbee2f62746067142dd4e4437fbd10a056b477b4a8",
+      "theme": "dark",
+      "viewport": {
+        "width": 420,
+        "height": 390
+      }
+    },
+    {
+      "filename": "dark/quick-trace-in-900x700.png",
+      "fixtureUrl": "http://127.0.0.1:4173/quick-trace.html?fixture=sample-model&direction=precedent",
+      "name": "quick-trace-in-900x700",
+      "sha256": "ae2cc05b2da0eb42020ce639cd69146bfb4731210eed459b62497d69add40e54",
+      "theme": "dark",
+      "viewport": {
+        "width": 900,
+        "height": 700
+      }
+    },
+    {
+      "filename": "dark/quick-trace-out-420x390.png",
+      "fixtureUrl": "http://127.0.0.1:4173/quick-trace.html?fixture=sample-model&direction=dependent",
+      "name": "quick-trace-out-420x390",
+      "sha256": "fe98ac64570b964c79b0e78829b3eac6b5d4d7169c2320d5be2dcf70983bd859",
+      "theme": "dark",
+      "viewport": {
+        "width": 420,
+        "height": 390
+      }
+    }
+  ],
+  "sourceCommit": "950e54d5cfd1c0dcd0cd4fe377053097f8bc93cd",
+  "status": "clean",
+  "timestamp": "2026-07-24T00:09:42.333Z"
+}

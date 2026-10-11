@@ -1,0 +1,53 @@
+{
+  "name": "analyst-lens",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13 <23",
+    "npm": "10.9.8"
+  },
+  "packageManager": "npm@10.9.8",
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "env -u NO_COLOR playwright test --pass-with-no-tests",
+    "build": "env -u ANALYST_LENS_FIXTURES vite build && tsc -p local-host/tsconfig.json && node scripts/verify-no-fixture-bundle.mjs",
+    "build:e2e": "env ANALYST_LENS_FIXTURES=1 vite build && tsc -p local-host/tsconfig.json",
+    "qa:capture": "node scripts/capture-ui-screenshots.mjs docs/qa/ui-modernization/current",
+    "verify:manifest": "office-addin-manifest validate manifest.xml && office-addin-manifest validate manifest.json",
+    "verify:office-boundary": "node scripts/verify-office-boundary.mjs",
+    "verify:network": "node scripts/verify-no-outbound.mjs",
+    "verify": "npm run lint && npm run typecheck && npm test && npm run test:e2e && npm run build && npm run verify:manifest && npm run verify:office-boundary && npm run verify:network"
+  },
+  "dependencies": {
+    "@fluentui/react-components": "9.74.4",
+    "@xyflow/react": "12.11.2",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.12.1",
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.61.1",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.2",
+    "@types/node": "22.20.1",
+    "@types/office-js": "1.0.599",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.3",
+    "eslint": "10.7.0",
+    "fs-extra": "7.0.1",
+    "globals": "17.7.0",
+    "jsdom": "29.1.1",
+    "office-addin-dev-certs": "2.0.10",
+    "office-addin-manifest": "2.1.6",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.64.0",
+    "vite": "8.1.4",
+    "vitest": "4.1.10"
+  }
+}

@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Hybrid — Command × Marginalia (dark)</title>
+<style>
+  :root {
+    --bg: #0e0f11;
+    --surface: #15171a;
+    --surface-2: #1b1e22;
+    --border: #26292e;
+    --border-strong: #34383e;
+    --ink: #e9ebee;
+    --ink-soft: #b8bcc4;
+    --ink-mute: #858a94;
+    --ink-faint: #5c616b;
+    --accent: #d4a373;         /* warm amber — annotation accent */
+    --accent-soft: #2a2419;
+    --live: #5eead4;           /* cool teal — live signal */
+    --input-blue: #7aa2f7;
+    --warning: #e5b567;
+    --danger: #e07a7a;
+    --serif: "New York", "Iowan Old Style", Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 12.5px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    width: 380px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ===== HERO — editorial type inside command chrome ===== */
+  .hero {
+    padding: 16px 18px 14px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+  }
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 10px;
+  }
+  .live-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--live);
+    box-shadow: 0 0 6px var(--live);
+  }
+  .hero-kind { color: var(--ink-faint); }
+  .hero-addr {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+    margin: 0 0 4px;
+    color: var(--ink);
+  }
+  .hero-addr .sheet {
+    color: var(--ink-mute);
+    font-style: italic;
+  }
+  .hero-gloss {
+    font-family: var(--serif);
+    font-size: 12.5px;
+    font-style: italic;
+    color: var(--ink-mute);
+    margin-bottom: 12px;
+  }
+  .hero-value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .hero-value {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--live);
+    font-variant-numeric: tabular-nums;
+  }
+  .hero-format {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+
+  /* ===== FORMULA — marginalia blockquote ===== */
+  .formula {
+    margin: 14px 18px 0;
+    padding: 0 0 0 14px;
+    border-left: 2px solid var(--accent);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    line-height: 1.75;
+    color: var(--ink-soft);
+    word-break: break-all;
+  }
+  .formula .fn { color: var(--accent); font-weight: 600; }
+  .formula .ref { color: var(--input-blue); }
+  .formula .external { color: var(--warning); }
+
+  /* ===== SOURCES — numbered annotations ===== */
+  .sources {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 18px;
+  }
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 8px;
+  }
+  .section-head .count {
+    font-family: var(--serif);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink-faint);
+    font-weight: 400;
+    font-size: 11px;
+  }
+
+  .annotation {
+    display: grid;
+    grid-template-columns: 20px 1fr auto;
+    gap: 10px;
+    padding: 8px 6px;
+    margin: 0 -6px;
+    border-radius: 5px;
+    align-items: baseline;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+  }
+  .annotation:hover { background: var(--surface); }
+  .annotation.selected {
+    background: var(--surface-2);
+    border-left-color: var(--accent);
+  }
+  .annotation-num {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--accent);
+    text-align: right;
+  }
+  .annotation-body { min-width: 0; }
+  .annotation-ref {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .annotation-gloss {
+    font-family: var(--serif);
+    font-size: 11.5px;
+    font-style: italic;
+    color: var(--ink-mute);
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .annotation-val {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .annotation-val .badge {
+    display: inline-block;
+    font-family: var(--sans);
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 1px 4px;
+    border-radius: 2px;
+    margin-left: 5px;
+    vertical-align: 1px;
+  }
+  .badge.ext { background: var(--accent-soft); color: var(--warning); }
+  .badge.dyn { background: #2a1a1a; color: var(--danger); }
+
+  /* ===== MARGIN NOTES — risk as editorial aside ===== */
+  .margin-notes {
+    padding: 0 18px 12px;
+  }
+  .margin-note {
+    font-family: var(--serif);
+    font-size: 11.5px;
+    font-style: italic;
+    color: var(--ink-mute);
+    padding: 5px 0 5px 16px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .margin-note::before {
+    content: "※";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-style: normal;
+  }
+
+  /* ===== COMMAND BAR — primary input ===== */
+  .command-bar {
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    padding: 10px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .cmd-input {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: 7px;
+    padding: 8px 11px;
+    color: var(--ink-faint);
+    font-size: 12px;
+  }
+  .cmd-input .cursor {
+    display: inline-block;
+    width: 6px; height: 13px;
+    background: var(--accent);
+    vertical-align: -2px;
+    animation: blink 1.2s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .cmd-input kbd {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 10px;
+    background: var(--bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border-strong);
+    color: var(--ink-mute);
+  }
+  .icon-btn {
+    width: 30px; height: 30px;
+    display: grid; place-items: center;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 7px;
+    color: var(--ink-mute);
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .icon-btn:hover { background: var(--surface-2); color: var(--ink); }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">
+    <span class="live-dot"></span>
+    <span>Live</span>
+    <span class="hero-kind">· Formula · IRR</span>
+  </div>
+  <h1 class="hero-addr"><span class="sheet">DCF</span> F42</h1>
+  <div class="hero-gloss">internal rate of return, discounted cash flow</div>
+  <div class="hero-value-row">
+    <span class="hero-value">18.42%</span>
+    <span class="hero-format">0.0%</span>
+  </div>
+</div>
+
+<div class="formula">
+  <span class="fn">=IRR</span>(<span class="ref">Inputs!$B$7:$B$12</span>)<br/>
+  &nbsp;&nbsp;+ <span class="ref">DCF!$D$20</span><br/>
+  &nbsp;&nbsp;× <span class="external">[Debt.xlsx]Terms!$B$4</span>
+</div>
+
+<div class="sources">
+  <div class="section-head">
+    <span>Sources</span>
+    <span class="count">five</span>
+  </div>
+
+  <div class="annotation">
+    <span class="annotation-num">i.</span>
+    <div class="annotation-body">
+      <div class="annotation-ref">Inputs!$B$7</div>
+      <div class="annotation-gloss">weighted average cost of capital</div>
+    </div>
+    <span class="annotation-val">9.50%</span>
+  </div>
+
+  <div class="annotation">
+    <span class="annotation-num">ii.</span>
+    <div class="annotation-body">
+      <div class="annotation-ref">DCF!$D$20</div>
+      <div class="annotation-gloss">terminal growth rate</div>
+    </div>
+    <span class="annotation-val">2.50%</span>
+  </div>
+
+  <div class="annotation selected">
+    <span class="annotation-num">iii.</span>
+    <div class="annotation-body">
+      <div class="annotation-ref">DCF!$C$10</div>
+      <div class="annotation-gloss">base-year free cash flow</div>
+    </div>
+    <span class="annotation-val">$1,240</span>
+  </div>
+
+  <div class="annotation">
+    <span class="annotation-num">iv.</span>
+    <div class="annotation-body">
+      <div class="annotation-ref">Terms!$B$4</div>
+      <div class="annotation-gloss">debt rate — external workbook</div>
+    </div>
+    <span class="annotation-val">5.25%<span class="badge ext">EXT</span></span>
+  </div>
+
+  <div class="annotation">
+    <span class="annotation-num">v.</span>
+    <div class="annotation-body">
+      <div class="annotation-ref">INDIRECT(DriverCell)</div>
+      <div class="annotation-gloss">dynamic reference, unresolved</div>
+    </div>
+    <span class="annotation-val">—<span class="badge dyn">DYN</span></span>
+  </div>
+</div>
+
+<div class="margin-notes">
+  <div class="margin-note">Crosses sheet boundary twice — verify Inputs is load-bearing.</div>
+  <div class="margin-note">External link to Debt.xlsx will break if that workbook moves.</div>
+</div>
+
+<div class="command-bar">
+  <div class="cmd-input">
+    <span class="cursor"></span>
+    <span>Ask about this cell…</span>
+    <kbd>⌘K</kbd>
+  </div>
+  <button class="icon-btn" title="Pin">⌘</button>
+  <button class="icon-btn" title="More">⋯</button>
+</div>
+
+</body>
+</html>
